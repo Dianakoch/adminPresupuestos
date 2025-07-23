@@ -1,7 +1,7 @@
 body {
     background: #000428;  /* fallback for old browsers */
-background: -webkit-linear-gradient(to right, #004e92, #000428);  
-background: linear-gradient(to right, #004e92, #000428); 
+background: -webkit-linear-gradient(to right, #92006e, #280000);  
+background: linear-gradient(to right, #92006e, #280000); 
 }
 header {
     margin: 30px 0;
@@ -32,7 +32,7 @@ h1{
 h2 {
     font-family: 'Raleway', sans-serif;
     font-weight: 100;
-    color:#004e92;
+    color:#920000;
     font-size: 22px;
     margin-bottom:30px;
 }
