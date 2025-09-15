@@ -23,6 +23,18 @@ class Presupuesto{
 
     nuevoGasto(gasto){
         this.gastos = [...this.gastos, gasto]; //agregamos cada gasto al array de gastos
+        this.calcularRestante();
+    }
+
+    calcularRestante(){
+        const gastado = this.gastos.reduce( (total, gasto) => total + gasto.cantidad, 0 );
+        this.restante =this.presupuesto - gastado;
+    
+    }
+
+    eliminarGasto(id){
+        this.gastos = this.gastos.filter(gasto => gasto.id !== id);
+        this.calcularRestante();
     }
 }
 
@@ -73,12 +85,16 @@ class UI{
             nuevoGasto.dataset.id = id; //tomamos el id
 
             //agregar html del gasto
-            nuevoGasto.innerHTML = `${nombre} <span class="badge-primary badge-pill"> ${cantidad} </span>`;
+            nuevoGasto.innerHTML = `${nombre} <span class="badge-primary badge-pill"> $ ${cantidad} </span>`;
 
             //btn para borrar el gasto
             const btnBorrar = document.createElement('button');
             btnBorrar.classList.add('btn', 'btn-danger', 'borrar-gasto');
             btnBorrar.textContent = 'Borrar';
+
+            btnBorrar.onclick = () =>{
+                eliminarGasto(id);
+            }
 
             nuevoGasto.appendChild(btnBorrar);
 
@@ -89,6 +105,32 @@ class UI{
     limpiarHTML(){
         while(gastoList.firstChild){
             gastoList.removeChild(gastoList.firstChild)
+        }
+    }
+
+    actualizarRestante(restante){
+        document.querySelector('#restante').textContent = restante;
+    }
+
+    comprobarPresupuesto(presupuestoObj){
+        const { presupuesto, restante } = presupuestoObj;
+        const restanteDiv = document.querySelector('.restante');
+
+        //comprobar 25%
+        if( (presupuesto / 4 ) > restante ){
+            restanteDiv.classList.remove('alert-success', 'alert-warning');
+            restanteDiv.classList.add('alert-danger');
+        } else if( (presupuesto / 2) > restante){
+            restanteDiv.classList.remove('alert-success');
+            restanteDiv.classList.add('alert-warning');        
+        }else{
+            restanteDiv.classList.remove('alert-danger', 'alert-warning');
+            restanteDiv.classList.add('alert-success');
+        }
+
+        if(restante <= 0){
+            ui.imprimirAlerta('Se agoto el presupuesto', 'error');
+            form.querySelector('button[type = "submit"]').disabled = true;
         }
     }
 }
@@ -144,9 +186,24 @@ function agregarGasto(e){ //ya que es un submit toma un evento e
     ui.imprimirAlerta('Gasto agregado');
 
     //imprimir gastos
-    const { gastos } = presupuesto;
+    const { gastos, restante } = presupuesto;
     ui.agregarLista(gastos);
+    ui.actualizarRestante(restante);
+
+    ui.comprobarPresupuesto(presupuesto);
 
     //reinicia formulario
     form.reset();
+}
+
+
+function eliminarGasto(id){
+    //alimiina los gastos del obj
+    presupuesto.eliminarGasto(id);
+
+    //elimina los gastos del html
+    const {gastos, restante} = presupuesto;
+    ui.agregarLista(gastos);
+    ui.actualizarRestante(restante);
+    ui.comprobarPresupuesto(presupuesto);
 }
