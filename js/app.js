@@ -227,6 +227,25 @@ function eliminarGasto(id){
 }
 
 
+function agregarPresupuesto(){
+    const agregar = prompt('¿Cuánto deseas agregar al presupuesto?');
+    
+    if(agregar === '' || agregar === null || isNaN(agregar) || agregar <= 0){
+        ui.imprimirAlerta('Cantidad no válida', 'error');
+        return;
+    }
+    
+    presupuesto.presupuesto += Number(agregar);
+    presupuesto.restante += Number(agregar);
+    
+    localStorage.setItem('presupuesto', JSON.stringify(presupuesto));
+    
+    ui.insertarPresupuesto(presupuesto);
+    ui.comprobarPresupuesto(presupuesto);
+    ui.imprimirAlerta('Presupuesto aumentado', 'success');
+}
+
+
 function limpiarLocalStorage(){
     if(confirm('¿Eliminar todos los datos?')){
         localStorage.clear();
