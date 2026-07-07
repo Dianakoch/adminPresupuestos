@@ -142,17 +142,33 @@ let presupuesto;
 
 //funciones
 function preguntarPresupuesto(){
-    const presupuestoU = prompt('Escribe tu presupuesto:');
+    //verificamo si hay un presupuesto en localStorage
+    const presupuestoGuardado = localStorage.getItem('presupuesto');
+    if(presupuestoGuardado){
+        const datosPresupuesto = JSON.parse(presupuestoGuardado);
+        presupuesto = new Presupuesto(datosPresupuesto.presupuesto);
+        presupuesto.gastos = JSON.parse(localStorage.getItem('gastos')) || [];
+        presupuesto.calcularRestante();
+        ui.insertarPresupuesto(presupuesto);
+        if(presupuesto.gastos.length > 0){
+            ui.agregarLista(presupuesto.gastos);
+        }
+        ui.comprobarPresupuesto(presupuesto);
+    }else{
+        const presupuestoU = prompt('Escribe tu presupuesto:');
 
     if(presupuestoU === '' || presupuestoU === null || isNaN(presupuestoU) || presupuestoU <= 0){ //isNaN compruba si es un string
         window.location.reload(); //si solo da enter se actualiza la pagina y vuelve a preguntar
     }
-
     //presupuesto valido
     presupuesto = new Presupuesto(presupuestoU)
     console.log(presupuesto)
+    localStorage.setItem('presupuesto', JSON.stringify(presupuesto));
 
     ui.insertarPresupuesto(presupuesto)
+
+    }
+    
 }
 
 
@@ -181,6 +197,7 @@ function agregarGasto(e){ //ya que es un submit toma un evento e
     
     //añade nuevo gasto
     presupuesto.nuevoGasto(gasto);
+    localStorage.setItem('gastos', JSON.stringify(presupuesto.gastos));
 
     //mensaje de gasto agregado
     ui.imprimirAlerta('Gasto agregado');
@@ -200,10 +217,27 @@ function agregarGasto(e){ //ya que es un submit toma un evento e
 function eliminarGasto(id){
     //alimiina los gastos del obj
     presupuesto.eliminarGasto(id);
+    localStorage.setItem('gastos', JSON.stringify(presupuesto.gastos));
 
     //elimina los gastos del html
     const {gastos, restante} = presupuesto;
     ui.agregarLista(gastos);
     ui.actualizarRestante(restante);
     ui.comprobarPresupuesto(presupuesto);
+}
+
+
+function limpiarLocalStorage(){
+    if(confirm('¿Eliminar todos los datos?')){
+        localStorage.clear();
+        window.location.reload();
+    }
+}
+
+
+function limpiarLocalStorage(){
+    if(confirm('¿Eliminar todos los datos?')){
+        localStorage.clear();
+        window.location.reload();
+    }
 }
